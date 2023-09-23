@@ -69,7 +69,7 @@ StackNavigationView(path: $presentedParks) {
 let navigationController = StackNavigationController(
   rootViewController: rootViewController,
   initialPath: viewModel.presentedParks,
-  onPathChanged: { viewModel.presentedParks = $0 },
+  onPathChanged: { [weak self] in self?.viewModel.presentedParks = $0 },
   destination: { ParkDetailsViewController(park: $0) }
 )
 ```
