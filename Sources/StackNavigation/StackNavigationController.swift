@@ -44,10 +44,10 @@ open class StackNavigationController<Data>: UINavigationController
     rootViewController: UIViewController,
     initialPath: Data,
     onPathChanged: ((Data) -> Void)? = nil,
-    destination: @escaping (Data) -> UIViewController
+    destination: @escaping (Data.Element) -> UIViewController
   ) {
     var destinations = DestinationBuilderStorage()
-    destinations[Data.self] = .init(
+    destinations[Data.Element.self] = .init(
       makeViewController: { destination($0) },
       updateViewController: { _, _ in }
     )
