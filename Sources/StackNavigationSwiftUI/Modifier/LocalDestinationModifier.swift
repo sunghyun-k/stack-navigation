@@ -12,7 +12,6 @@ extension View {
         destination: destination
       )
     )
-    .environmentObject(EmptyObject())
   }
 }
 
@@ -29,15 +28,13 @@ fileprivate struct LocalDestinationModifier<V: View>: ViewModifier {
   @Variable private var first = true
   @Environment(\.navigationController) private var navigationController
   
-  @EnvironmentObject private var object: EmptyObject
-  
   func body(content: Content) -> some View {
     performNavigation(oldIsPresented: &oldIsPresented)
     return content
       .onAppear {
         sinkDismissStream()
       }
-      .environmentObject(object)
+      .environmentObject(EmptyObject())
   }
   
   @MainActor

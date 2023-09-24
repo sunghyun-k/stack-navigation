@@ -62,7 +62,10 @@ open class StackNavigationController<Data>: UINavigationController
   public required init?(coder aDecoder: NSCoder) { fatalError() }
   
   open func update(using path: Data) {
-    if lastPath.elementsEqual(path) { return }
+    if lastPath.elementsEqual(path) {
+      refreshViews()
+      return
+    }
     guard let rootVC = viewControllers.first else { return }
     lastPath = path
     // 루트VC는 건너뛰고 업데이트한다.
@@ -91,6 +94,14 @@ open class StackNavigationController<Data>: UINavigationController
       setPosition(index, for: newVCs.last!)
     }
     super.setViewControllers([rootVC] + newVCs, animated: true)
+  }
+  
+  private func refreshViews() {
+    for (datum, vc) in zip(lastPath, viewControllers.dropFirst()) {
+      if let builder = destinations[datum: datum] {
+        _ = builder.updateViewController(vc, datum)
+      }
+    }
   }
   
   open override func popViewController(animated: Bool) -> UIViewController? {
