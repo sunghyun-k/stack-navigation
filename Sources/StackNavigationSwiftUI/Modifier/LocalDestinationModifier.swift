@@ -6,23 +6,25 @@ extension View {
     isPresented: Binding<Bool>,
     @ViewBuilder destination: @escaping () -> some View
   ) -> some View {
+    snNavigationDestination(isPresented: isPresented) {
+      NavigationBindingController(content: destination())
+    }
+  }
+  
+  public func snNavigationDestination(
+    isPresented: Binding<Bool>,
+    destinationViewController: @escaping () -> UIViewController
+  ) -> some View {
     modifier(
-      LocalDestinationModifier(
-        isPresented: isPresented,
-        destination: destination
-      )
+      LocalDestinationModifier(isPresented: isPresented, destination: destinationViewController)
     )
   }
 }
 
-fileprivate struct LocalDestinationModifier<V: View>: ViewModifier {
+fileprivate struct LocalDestinationModifier: ViewModifier {
   
   @Binding var isPresented: Bool
-  @ViewBuilder var destination: V
-  init(isPresented: Binding<Bool>, destination: () -> V) {
-    self._isPresented = isPresented
-    self.destination = destination()
-  }
+  var destination: () -> UIViewController
   
   @Variable private var oldIsPresented = false
   @Variable private var first = true
@@ -31,9 +33,7 @@ fileprivate struct LocalDestinationModifier<V: View>: ViewModifier {
   func body(content: Content) -> some View {
     performNavigation(oldIsPresented: &oldIsPresented)
     return content
-      .onAppear {
-        sinkDismissStream()
-      }
+      .onAppear { sinkDismissStream() }
       .environmentObject(EmptyObject())
   }
   
@@ -42,7 +42,7 @@ fileprivate struct LocalDestinationModifier<V: View>: ViewModifier {
     if isPresented == oldIsPresented { return }
     oldIsPresented = isPresented
     if isPresented {
-      navigationController.pushViewController(NavigationBindingController(content: destination))
+      navigationController.pushViewController(destination())
     } else {
       navigationController.popToSelf()
     }
