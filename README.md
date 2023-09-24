@@ -114,7 +114,7 @@ extension AppDelegate: StackNavigationControllerDelegate {
 ```swift
 let pathUpdate = viewModel.$presentedParks
   .sink { [weak navigationController] newPath in
-    navigationController?.update(using: newPath)
+    navigationController?.updateStacks(newPath)
   }
 ```
 
