@@ -61,9 +61,9 @@ open class StackNavigationController<Data>: UINavigationController
   
   public required init?(coder aDecoder: NSCoder) { fatalError() }
   
-  open func update(using path: Data) {
+  open func updateStacks(_ path: Data) {
     if lastPath.elementsEqual(path) {
-      refreshViews()
+      updateChildViews()
       return
     }
     guard let rootVC = viewControllers.first else { return }
@@ -96,7 +96,7 @@ open class StackNavigationController<Data>: UINavigationController
     super.setViewControllers([rootVC] + newVCs, animated: true)
   }
   
-  private func refreshViews() {
+  private func updateChildViews() {
     for (datum, vc) in zip(lastPath, viewControllers.dropFirst()) {
       if let builder = destinations[datum: datum] {
         _ = builder.updateViewController(vc, datum)
