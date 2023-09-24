@@ -69,6 +69,17 @@ StackNavigationView(path: $presentedParks) {
 }
 ```
 
+#### Change navigation title
+
+Add snNavigationTitle(:) modifier in the Root View or Destination View.
+
+snNavigationTitle(:) 모디파이어를 Root View 또는 Destination View에서 호출합니다.
+
+```swift
+content
+  .snNavigationTitle(park.name)
+```
+
 ### With UIKit
 
 #### Stack based navigation (Global destination)
