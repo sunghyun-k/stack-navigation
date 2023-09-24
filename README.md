@@ -101,7 +101,7 @@ let navigationController = StackNavigationController(
 
 ```swift
 extension AppDelegate: StackNavigationControllerDelegate {
-  func navigationController(didChangePath changedPath: Data) {
+  func navigationController(didChangePath changedPath: [Park]) {
     viewModel.presentedParks = changedPath
   }
 }
