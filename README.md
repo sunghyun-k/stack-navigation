@@ -6,7 +6,7 @@ Stack Navigation은 SwiftUI의 NavigationStack과 유사하게 Path 상태를 �
 
 ## Requirements
 
-- Swift 5.9 or later
+- Swift 5.6 or later
 - iOS 13 or later
 
 ## Usage
@@ -71,13 +71,12 @@ StackNavigationView(path: $presentedParks) {
 
 #### Change navigation title
 
-Add snNavigationTitle(:) modifier in the Root View or Destination View.
+Add `snNavigationTitle(:)` modifier in the Root View or Destination View.
 
-snNavigationTitle(:) 모디파이어를 Root View 또는 Destination View에서 호출합니다.
+`snNavigationTitle(:)` 모디파이어를 Root View 또는 Destination View에 추가합니다.
 
 ```swift
-content
-  .snNavigationTitle(park.name)
+content.snNavigationTitle(park.name)
 ```
 
 ### With UIKit
@@ -92,14 +91,25 @@ content
 let navigationController = StackNavigationController(
   rootViewController: rootViewController,
   initialPath: viewModel.presentedParks,
-  onPathChanged: { [weak self] in self?.viewModel.presentedParks = $0 },
   destination: { ParkDetailsViewController(park: $0) }
 )
 ```
 
-2. When the Path of the view model changes, call the `update(using:)` method to update the view.
+2. If you want to change the state when path changed, use the StackNavigationControllerDelegate.
 
-   뷰 모델의 Path 변경시 `update(using:)` 메서드를 호출하여 뷰를 업데이트합니다.
+   Path가 변경될 때 뷰모델의 상태에 반영하고 싶다면 StackNavigationControllerDelegate를 사용합니다.
+
+```swift
+extension AppDelegate: StackNavigationControllerDelegate {
+  func navigationController(didChangePath changedPath: Data) {
+    viewModel.presentedParks = changedPath
+  }
+}
+```
+
+3. When the Path of the view model changes, call the `updateStacks(using:)` method to update the view.
+
+   뷰 모델의 Path 변경시 `updateStacks(:)` 메서드를 호출하여 뷰를 업데이트합니다.
 
 ```swift
 let pathUpdate = viewModel.$presentedParks
