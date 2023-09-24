@@ -1,16 +1,22 @@
 import UIKit
 import SwiftUI
 
+@MainActor
+public protocol StackNavigationControllerDelegate<Data>: AnyObject {
+  associatedtype Data
+  func navigationController(didChangePath changedPath: Data)
+}
+
 open class StackNavigationController<Data>: UINavigationController
   where Data: MutableCollection & RandomAccessCollection & RangeReplaceableCollection,
         Data.Element: Hashable
 {
   
   private var lastPath: Data
-  public var onPathChanged: ((Data) -> Void)?
+  public weak var stackDelegate: (any StackNavigationControllerDelegate<Data>)?
   private func publishPath() {
     if !NavigationUpdateContext.isUpdatingView {
-      onPathChanged?(lastPath)
+      stackDelegate?.navigationController(didChangePath: lastPath)
     }
   }
   
@@ -30,11 +36,9 @@ open class StackNavigationController<Data>: UINavigationController
   public init(
     rootViewController: UIViewController,
     initialPath: Data,
-    onPathChanged: ((Data) -> Void)? = nil,
     destinations: DestinationBuilderStorage = DestinationBuilderStorage()
   ) {
     self.destinations = destinations
-    self.onPathChanged = onPathChanged
     self.lastPath = initialPath
     
     super.init(rootViewController: rootViewController)
@@ -43,7 +47,6 @@ open class StackNavigationController<Data>: UINavigationController
   public convenience init(
     rootViewController: UIViewController,
     initialPath: Data,
-    onPathChanged: ((Data) -> Void)? = nil,
     destination: @escaping (Data.Element) -> UIViewController
   ) {
     var destinations = DestinationBuilderStorage()
@@ -54,7 +57,6 @@ open class StackNavigationController<Data>: UINavigationController
     self.init(
       rootViewController: rootViewController,
       initialPath: initialPath,
-      onPathChanged: onPathChanged,
       destinations: destinations
     )
   }

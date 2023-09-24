@@ -38,11 +38,7 @@ fileprivate struct _StackNavigationView<Content: View, Data>: UIViewControllerRe
     context.coordinator.rootViewController = rootVC
     return StackNavigationController<Data>(
       rootViewController: rootVC,
-      initialPath: path,
-      onPathChanged: { [weak coordinator = context.coordinator] newPath in
-        coordinator?.isUpdatingState = true
-        path = newPath
-      }
+      initialPath: path
     )
   }
   
@@ -61,12 +57,21 @@ fileprivate struct _StackNavigationView<Content: View, Data>: UIViewControllerRe
   }
   
   func makeCoordinator() -> Coordinator {
-    Coordinator()
+    Coordinator(self)
   }
   
   @MainActor
-  final class Coordinator {
+  final class Coordinator: StackNavigationControllerDelegate {
+    var parent: _StackNavigationView
     weak var rootViewController: NavigationBindingController<Content>?
     var isUpdatingState = false
+    
+    init(_ parent: _StackNavigationView) {
+      self.parent = parent
+    }
+    
+    func navigationController(didChangePath changedPath: Data) {
+      parent.path = changedPath
+    }
   }
 }
