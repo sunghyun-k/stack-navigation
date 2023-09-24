@@ -1,3 +1,3 @@
-package enum NavigationUpdateContext {
-  @TaskLocal package static var isUpdatingView = false
+@_spi(package) public enum NavigationUpdateContext {
+  @TaskLocal public static var isUpdatingView = false
 }

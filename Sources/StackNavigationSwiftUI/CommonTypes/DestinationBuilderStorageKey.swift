@@ -1,5 +1,5 @@
 import SwiftUI
-import struct StackNavigation.DestinationBuilderStorage
+@_spi(package) import struct StackNavigation.DestinationBuilderStorage
 
 internal struct DestinationBuilderStorageKey: PreferenceKey {
   static let defaultValue = DestinationBuilderStorage()

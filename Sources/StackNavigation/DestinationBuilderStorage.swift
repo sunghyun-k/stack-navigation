@@ -12,20 +12,22 @@ public struct TypedDestinationBuilder<Datum, ViewController: UIViewController> {
   }
 }
 
-package struct DestinationBuilder: Equatable {
+@_spi(package)
+public struct DestinationBuilder: Equatable {
   var key: ObjectIdentifier
   var makeViewController: (Any) -> UIViewController
   /// 타입이 일치하여 업데이트가 된 경우 true 반환
   var updateViewController: (UIViewController, Any) -> Bool
   
-  package static func ==(lhs: Self, rhs: Self) -> Bool {
+  public static func ==(lhs: Self, rhs: Self) -> Bool {
     lhs.key == rhs.key
   }
 }
 
 public struct DestinationBuilderStorage: Equatable {
   
-  package var builders: [ObjectIdentifier: DestinationBuilder] = [:]
+  @_spi(package)
+  public var builders: [ObjectIdentifier: DestinationBuilder] = [:]
   
   public init() { }
   

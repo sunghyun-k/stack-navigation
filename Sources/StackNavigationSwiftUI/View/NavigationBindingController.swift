@@ -1,6 +1,6 @@
 import SwiftUI
 import UIKit
-import enum StackNavigation.NavigationUpdateContext
+@_spi(package) import enum StackNavigation.NavigationUpdateContext
 
 open class NavigationBindingController<Content>:
   UIHostingController<_NavigationEnvironmentView<Content>>
