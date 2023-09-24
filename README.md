@@ -1,5 +1,7 @@
 # Stack Navigation
 
+Stack Navigation is a library for UIKit and SwiftUI that displays destinations based on the path state, similar to SwiftUI's NavigationStack.
+
 Stack Navigation은 SwiftUI의 NavigationStack과 유사하게 Path 상태를 기반으로 Destination들을 표시하는 UIKit 및 SwiftUI 용 라이브러리입니다.
 
 ## Requirements
@@ -9,17 +11,21 @@ Stack Navigation은 SwiftUI의 NavigationStack과 유사하게 Path 상태를 �
 
 ## Usage
 
-### SwiftUI
+### With SwiftUI
 
-#### Stack Navigation (Global Destination)
+#### Stack based navigation (Global destination)
 
-1. 데이터 컬렉션 프로퍼티를 추가합니다.
+1. Add data collection property.
+
+   데이터 컬렉션 프로퍼티를 추가합니다.
 
 ```swift
 @State private var presentedParks: [Park] = []
 ```
 
-2. StackNavigationView와 데이터 컬렉션 값을 바인딩하고, `snNavigationDestination(for:destination:)`을 사용하여 Destination을 추가합니다.
+2. Bind the StackNavigationView to a data collection value and add a Destination using `snNavigationDestination(for:destination:)`.
+
+   StackNavigationView와 데이터 컬렉션 값을 바인딩하고, `snNavigationDestination(for:destination:)`을 사용하여 Destination을 추가합니다.
 
 ```swift
 StackNavigationView(path: $presentedParks) {
@@ -34,16 +40,20 @@ StackNavigationView(path: $presentedParks) {
 }
 ```
 
-#### Tree Navigation (Local Destination)
+#### Tree based navigation (Local destination)
 
-1. Bool 프로퍼티를 추가합니다.
+1. Add a bool property.
+
+   Bool 프로퍼티를 추가합니다.
 
 ```swift
 @State private var showDetails = false
 var park: Park
 ```
 
-2. StackNavigationView 내부에 모디파이어를 추가합니다.
+2. Add a modifier inside StackNavigationView.
+
+   StackNavigationView 내부에 모디파이어를 추가합니다.
 
 ```swift
 StackNavigationView(path: $presentedParks) {
@@ -59,22 +69,26 @@ StackNavigationView(path: $presentedParks) {
 }
 ```
 
-### UIKit
+### With UIKit
 
-#### Stack Navigation (Global Destination)
+#### Stack based navigation (Global destination)
 
-1. 내비게이션을 사용할 컨테이너(AppDelegate, ViewController 등)에서 이니셜라이즈합니다.
+1. Initialize the navigation in the container such as AppDelegate, ViewController, etc.
+
+   내비게이션을 사용할 컨테이너(AppDelegate, ViewController 등)에서 이니셜라이즈합니다.
 
 ```swift
 let navigationController = StackNavigationController(
   rootViewController: rootViewController,
   initialPath: viewModel.presentedParks,
-  onPathChanged: { [weak self] in self?.viewModel.presentedParks = $0 },
+  onPathChanged: { viewModel.presentedParks = $0 },
   destination: { ParkDetailsViewController(park: $0) }
 )
 ```
 
-2. 뷰 모델의 Path 변경시 update(using:) 메서드를 호출하여 뷰를 업데이트합니다.
+2. When the Path of the view model changes, call the `update(using:)` method to update the view.
+
+   뷰 모델의 Path 변경시 `update(using:)` 메서드를 호출하여 뷰를 업데이트합니다.
 
 ```swift
 let pathUpdate = viewModel.$presentedParks
@@ -83,23 +97,36 @@ let pathUpdate = viewModel.$presentedParks
   }
 ```
 
-#### Tree Navigation (Local Destination)
+#### Tree based navigation (Local destination)
+
+Use pushViewController as usual.
 
 기존 처럼 pushViewController를 사용합니다.
 
-## UIKit 및 SwiftUI에서 동시 사용 (Tree)
+## Move between UIKit and SwiftUI (Tree based)
 
-### UIViewController에서 SwiftUI 뷰 Push하기
+### Pushing SwiftUI View from UIViewController
+
+Create a NavigationBindingController using SwiftUI views and push it.
 
 SwiftUI 뷰를 사용해 NavigationBindingController를 생성하고 Push합니다.
 
 ```swift
-let swiftUIView: some View = // ...
-let bindingController = NavigationBindingController(content: swiftUIView)
+let parkDetailsView: some View = ParkDetails(park: park)
+let bindingController = NavigationBindingController(content: parkDetailsView)
 navigationController?.pushViewController(bindingController, animated: true)
 ```
 
-### SwiftUI 뷰에서 UIViewController Push하기
+### Pushing UIViewController from SwiftUI view
 
-아직 기능이 준비되지 않았습니다. 그러나 딱 한번 Push되고 이후 Push할 뷰컨트롤러가 없는 경우 UIViewControllerRepresentable을 사용하여 표시할 수 있습니다.
+Define a Destination View Controller using the `snNavigationDestination(isPresented:destinationViewController:)` modifier.
+
+`snNavigationDestination(isPresented:destinationViewController:)` 모디파이어를 사용하여 Destination View Controller를 정의합니다.
+
+```swift
+content
+  .snNavigationDestination(isPresented: $showDetails) {
+    ParkDetailsViewController(park: park)
+  }
+```
 
