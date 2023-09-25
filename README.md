@@ -6,7 +6,7 @@ Stack Navigation은 SwiftUI의 NavigationStack과 유사하게 Path 상태를 �
 
 ## Requirements
 
-- Swift 5.6 or later
+- Swift 5.7 or later
 - iOS 13 or later
 
 ## Usage
