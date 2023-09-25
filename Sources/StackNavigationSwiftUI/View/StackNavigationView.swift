@@ -36,10 +36,12 @@ fileprivate struct _StackNavigationView<Content: View, Data>: UIViewControllerRe
   func makeUIViewController(context: Context) -> StackNavigationController<Data> {
     let rootVC = NavigationBindingController(content: root)
     context.coordinator.rootViewController = rootVC
-    return StackNavigationController<Data>(
+    let nc = StackNavigationController<Data>(
       rootViewController: rootVC,
       initialPath: path
     )
+    nc.stackDelegate = context.coordinator
+    return nc
   }
   
   func updateUIViewController(_ navigationController: StackNavigationController<Data>, context: Context) {
