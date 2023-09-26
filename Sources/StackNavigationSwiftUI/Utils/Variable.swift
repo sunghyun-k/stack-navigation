@@ -3,7 +3,7 @@ import SwiftUI
 @propertyWrapper
 internal struct Variable<Value>: DynamicProperty {
   
-  private class Storage {
+  private final class Storage {
     var value: Value
     init(_ value: Value) { self.value = value }
   }

@@ -15,13 +15,17 @@ public struct StackNavigationView<Content: View, Data>: View
     self.root = root()
   }
   
-  @State private var destinations = DestinationBuilderStorage()
+  @Variable private var onDestinationsChange: ((DestinationBuilderStorage) -> Void)?
   
   public var body: some View {
-    _StackNavigationView(path: $path, root: root, destinations: destinations)
-      .onPreferenceChange(DestinationBuilderStorageKey.self) {
-        destinations = $0
-      }
+    _StackNavigationView(
+      path: $path,
+      root: root,
+      registerDestinationsChange: { onDestinationsChange = $0 }
+    )
+    .onPreferenceChange(DestinationBuilderStorageKey.self) {
+      onDestinationsChange?($0)
+    }
   }
 }
 
@@ -31,7 +35,7 @@ fileprivate struct _StackNavigationView<Content: View, Data>: UIViewControllerRe
 {
   @Binding var path: Data
   var root: Content
-  var destinations: DestinationBuilderStorage
+  var registerDestinationsChange: (@escaping (DestinationBuilderStorage) -> Void) -> Void
   
   func makeUIViewController(context: Context) -> StackNavigationController<Data> {
     let rootVC = NavigationBindingController(content: root)
@@ -41,6 +45,7 @@ fileprivate struct _StackNavigationView<Content: View, Data>: UIViewControllerRe
       initialPath: path
     )
     nc.stackDelegate = context.coordinator
+    registerDestinationsChange { [weak nc] in nc?.destinations = $0 }
     return nc
   }
   
@@ -53,7 +58,6 @@ fileprivate struct _StackNavigationView<Content: View, Data>: UIViewControllerRe
       navigationController.updateStacks(path)
     }
     
-    navigationController.destinations = destinations
     updateView()
     context.coordinator.rootViewController?.updateView(root)
   }
