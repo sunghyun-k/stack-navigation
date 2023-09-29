@@ -59,7 +59,7 @@ fileprivate struct LocalDestinationModifier: ViewModifier {
   
   private func sinkDismissStream() {
     variables.dismissStateUpdateTask = Task {
-      for await _ in navigationController.onDismissStream() {
+      for await _ in navigationController.onChildDismissStream() {
         if isPresented { isPresented = false }
       }
     }

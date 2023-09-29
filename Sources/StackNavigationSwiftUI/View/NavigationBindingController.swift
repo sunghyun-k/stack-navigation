@@ -43,7 +43,7 @@ open class NavigationBindingController<Content>:
         self?.popToSelf()
       },
       
-      onDismissStream: { [weak self] in
+      onChildDismissStream: { [weak self] in
         AsyncStream { [weak self] continuation in
           let sub = self?.onChildDismissPublisher
             .sink { continuation.yield() }
@@ -53,6 +53,18 @@ open class NavigationBindingController<Content>:
         }
       }
     )
+    rootView.dismiss = { [weak self] in
+      guard
+        let nc = self?.navigationController,
+        let selfPosition = nc.viewControllers
+          .lastIndex(where: { $0 === self }),
+        selfPosition >= 0
+      else { return }
+      nc.popToViewController(
+        nc.viewControllers[selfPosition - 1],
+        animated: true
+      )
+    }
   }
   
   private func pushFromSelf(_ viewController: UIViewController) {
@@ -83,21 +95,21 @@ open class NavigationBindingController<Content>:
 
 public struct _NavigationEnvironmentView<Content: View>: View {
   
-  var onTitleChanged: ((String) -> Void)?
-  var navigationControllerProxy: NavigationControllerProxy?
+  var onTitleChanged: @MainActor (String) -> Void = { _ in }
+  var navigationControllerProxy = NavigationControllerProxy.defaultValue
+  var dismiss: (@MainActor () -> Void)?
   @ViewBuilder
   var content: Content
-  
-  @Environment(\.navigationController) private var parentNavigationProxy
   
   public var body: some View {
     content
       .onPreferenceChange(NavigationTitlePreferenceKey.self) { newValue in
-        onTitleChanged?(newValue)
+        onTitleChanged(newValue)
       }
+      .environment(\.snDismiss, .init(action: { dismiss?() }))
       .environment(
         \.navigationController,
-        navigationControllerProxy ?? parentNavigationProxy
+        navigationControllerProxy
       )
   }
 }
