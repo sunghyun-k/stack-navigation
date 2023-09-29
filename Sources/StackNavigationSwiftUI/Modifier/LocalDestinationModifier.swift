@@ -59,5 +59,5 @@ fileprivate struct LocalDestinationModifier: ViewModifier {
   }
 }
 
-/// View가 Disappear되었을 시에도 modifier 호출을 하기 위한 클래스.
+/// View가 Disappear상태 시에도 modifier의 body 호출을 하기 위한 클래스. 자식에서 isPresented를 false로 바꿔도 pop되지 않는 문제를 수정한다.
 fileprivate final class EmptyObject: ObservableObject { }
