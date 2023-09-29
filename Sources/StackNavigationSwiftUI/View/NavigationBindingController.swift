@@ -1,5 +1,6 @@
 import SwiftUI
 import UIKit
+import Combine
 @_spi(package) import enum StackNavigation.NavigationUpdateContext
 
 open class NavigationBindingController<Content>:
@@ -15,13 +16,13 @@ open class NavigationBindingController<Content>:
   
   public required init?(coder aDecoder: NSCoder) { fatalError() }
   
-  private var onDismissSubscriptions: [() -> Void] = []
+  private let onChildDismissPublisher = PassthroughSubject<Void, Never>()
   
   open override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     
     if !isMovingToParent {
-      onDismissSubscriptions.forEach { $0() }
+      onChildDismissPublisher.send()
     }
   }
   
@@ -42,8 +43,14 @@ open class NavigationBindingController<Content>:
         self?.popToSelf()
       },
       
-      onDismiss: { [weak self] action in
-        self?.onDismissSubscriptions.append(action)
+      onDismissStream: { [weak self] in
+        AsyncStream { [weak self] continuation in
+          let sub = self?.onChildDismissPublisher
+            .sink { continuation.yield() }
+          continuation.onTermination = { _ in
+            sub?.cancel()
+          }
+        }
       }
     )
   }

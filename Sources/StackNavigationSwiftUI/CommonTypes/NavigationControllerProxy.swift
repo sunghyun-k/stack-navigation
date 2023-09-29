@@ -3,14 +3,14 @@ import SwiftUI
 internal struct NavigationControllerProxy {
   var pushViewController: @MainActor (UIViewController) -> Void
   var popToSelf: @MainActor () -> Void
-  var onDismiss: (@escaping @MainActor () -> Void) -> Void
+  var onDismissStream: () -> AsyncStream<Void>
 }
 
 extension NavigationControllerProxy: EnvironmentKey {
   static let defaultValue = Self(
     pushViewController: { _ in },
     popToSelf: { },
-    onDismiss: { _ in }
+    onDismissStream: { AsyncStream { $0.finish() } }
   )
 }
 
