@@ -34,6 +34,9 @@ open class NavigationBindingController<Content>:
     rootView.onTitleChanged = { [weak self] title in
       self?.title = title
     }
+    rootView.onNavigationBarHiddenChanged = { [weak self] hidden in
+      self?.navigationController?.isNavigationBarHidden = hidden
+    }
     rootView.navigationControllerProxy = .init(
       pushViewController: { [weak self] vc in
         self?.pushFromSelf(vc)
@@ -96,6 +99,7 @@ open class NavigationBindingController<Content>:
 public struct _NavigationEnvironmentView<Content: View>: View {
   
   var onTitleChanged: @MainActor (String) -> Void = { _ in }
+  var onNavigationBarHiddenChanged: (Bool) -> Void = { _ in }
   var navigationControllerProxy = NavigationControllerProxy.defaultValue
   var dismiss: (@MainActor () -> Void)?
   @ViewBuilder
@@ -105,6 +109,9 @@ public struct _NavigationEnvironmentView<Content: View>: View {
     content
       .onPreferenceChange(NavigationTitlePreferenceKey.self) { newValue in
         onTitleChanged(newValue)
+      }
+      .onPreferenceChange(NavigationBarHiddenKey.self) { newValue in
+        onNavigationBarHiddenChanged(newValue)
       }
       .environment(\.snDismiss, .init(action: { dismiss?() }))
       .environment(
